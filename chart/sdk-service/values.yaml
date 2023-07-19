@@ -1,0 +1,49 @@
+# Default values for synthesized-tdk.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  repository:
+  tag:
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+containerSecurityContext: {}
+
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+resources:
+#  limits:
+#    cpu: 0.5
+#    memory: 1Gi
+#  requests:
+#    cpu: 0.5
+#    memory: 1Gi
+
+# -- Environment variables
+env: {}
+
+# -- Sensitive environment variables that will be rendered as a new secret object
+envRenderSecret: {}
+
+# -- Pass the configuration directives and envRenderSecret through Helm's templating engine.
+## ref: https://helm.sh/docs/developing_charts/#using-the-tpl-function
+tplConfig: false
+
+# -- Reference to an external secret that contains sensitive environment variables
+# This option is useful to avoid store sensitive values in Git. You need to create the secret manually and reference it.
+# If secretRef is used, the envRenderSecret parameter will be omitted (in case that it has content).
+secretRef:

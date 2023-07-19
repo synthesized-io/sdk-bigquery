@@ -1,0 +1,83 @@
+x-google-marketplace:
+  schemaVersion: v2
+
+  applicationApiVersion: v1beta1
+
+  publishedVersion: "$TAG"
+  publishedVersionMetadata:
+    releaseNote: >-
+      Initial release.
+    releaseTypes:
+      - Feature
+    recommended: false
+
+  images:
+    '':
+      properties:
+        image.repository:
+          type: REPO_WITH_REGISTRY
+        image.tag:
+          type: TAG
+
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  envRenderSecret.SYNTHESIZED_KEY:
+    title: Synthesized Licence Key
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
+  serviceAccount:
+    type: string
+    title: SDK Jupyter Service Account
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: Service account used by SDK Jupyter deployment
+        roles:
+          - type: ClusterRole
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [ "" ]
+                resources: [ "pods", "serviceaccounts" ]
+                verbs: [ "get", "list" ]
+              - apiGroups: [ "extensions" ]
+                resources: [ "deployments" ]
+                verbs: [ "get", "list" ]
+              - apiGroups: [ "apps" ]
+                resources: [ "deployments" ]
+                verbs: [ "get", "list" ]
+              - apiGroups: [ "" ]
+                resources: [ "pods/exec" ]
+                verbs: [ "create", "get" ]
+  resources.limits.cpu:
+    type: string
+    default: null
+    title: CPU limit for each server instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([m]?)$'
+  resources.limits.memory:
+    type: string
+    default: null
+    title: Memory limit for each server instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$'
+  certificate:
+    type: string
+    x-google-marketplace:
+      type: TLS_CERTIFICATE
+      tlsCertificate:
+        generatedProperties:
+          base64EncodedPrivateKey: tls.base64EncodedPrivateKey
+          base64EncodedCertificate: tls.base64EncodedCertificate
+
+required:
+  - name
+  - namespace
+

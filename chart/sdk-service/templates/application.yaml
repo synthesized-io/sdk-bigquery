@@ -1,0 +1,61 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app: {{ .Release.Name }}
+    name: {{ .Release.Name }}
+  annotations:
+    marketplace.cloud.google.com/deploy-info: '{"partner_id": "synthesized", "product_id": {{ .Chart.Name | quote }}, "partner_name": "Synthesized"}'
+spec:
+  descriptor:
+    type: SDK
+    version: "{{ .Values.image.tag }}"
+    description: |-
+      Synthesized Scientific Data Kit (SDK) is a comprehensive framework for generative modelling for structured data (tabular, time-series and event-based data). The SDK helps you create compliant statistical-preserving data snapshots for BI/Analytics and ML/AI applications. Right-size your data with AI-supported data transformations.
+      This delivery contains the SDK bundled up with a Jupyter notebook. This provides an easy platform to start working with synthetic data.
+    maintainers:
+      - name: Synthesized
+        url: https://www.synthesized.io/
+    links:
+      - description: 'User Guide'
+        url: https://github.com/synthesized-io/sdk-on-gcp/blob/main/README.md
+    notes: |-
+      # Open your web server
+
+      SDK Notebook is exposed by the ClusterIP-only service `{{ .Release.Name }}-service`. To connect to the
+      SDK Webserver, you can either expose a public service endpoint, or keep it private, but connect
+      from your local environment with `kubectl port-forward`.
+
+      ## Forward the Webserver port in your local environment
+
+      To use `kubectl`'s port forwarding feature to forward port to your local
+      machine, run the following command in the background:
+
+      ```shell
+      kubectl port-forward \
+        --namespace {{ .Release.Namespace }} \
+        svc/{{ .Release.Name }}-service \
+        8888:8888
+      ```
+
+      Now you can access the Webserver with [http://localhost:8888](http://localhost:8888).
+  info:
+    - name: Forward Jupyter Notebook Webserver port locally
+      value: kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ .Release.Name }}-service 8888:8888
+    - name: Jupyter Notebook Webserver address (local only)
+      value: "http://localhost:8888/"
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}
+  addOwnerRef: true
+  componentKinds:
+    - group: v1
+      kind: Secret
+    - group: v1
+      kind: Service
+    - group: apps/v1
+      kind: Deployment
+    - group: app.k8s.io/v1beta1
+      kind: BackendConfig
