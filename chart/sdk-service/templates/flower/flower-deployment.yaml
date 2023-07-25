@@ -22,8 +22,13 @@ spec:
       containers:
         - name: flower
           image: "{{ .Values.flower.image.repository }}:{{ .Values.flower.image.tag }}"
-          command:
-            - celery --broker=redis://redis:6379 flower
+          args:
+            - "celery"
+            - "--broker=redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
+            - "flower"
+          env:
+            - name: FLOWER_UNAUTHENTICATED_API
+              value: "true"
           ports:
             - name: http
               containerPort: 5555
