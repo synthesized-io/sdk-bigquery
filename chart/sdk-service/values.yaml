@@ -9,6 +9,26 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
+flower:
+  image:
+    repository:
+    tag:
+
+redis:
+  image:
+    repository:
+    tag:
+  password: null
+
+  resources:
+    requests:
+      memory: 1Gi
+
+  persistence:
+    storageClass: standard
+    accessMode: ReadWriteOnce
+    size: 1Gi
+
 serviceAccount:
 
 securityContext: {}

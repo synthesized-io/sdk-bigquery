@@ -1,17 +1,18 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-service
-  labels: &SdkServiceLabels
+  name: {{ .Release.Name }}-flower-service
+  labels: &FlowerServiceLabels
     app: {{ .Release.Name }}
     name: {{ .Release.Name }}
+    component: flower
   annotations:
     cloud.google.com/backend-config: '{"default": "{{ .Release.Name }}-backendconfig"}'
 spec:
-  selector: *SdkServiceLabels
+  selector: *FlowerServiceLabels
   ports:
     - name: http
       protocol: TCP
-      port: 8888
-      targetPort: 8888
+      port: 5555
+      targetPort: 5555
   type: ClusterIP

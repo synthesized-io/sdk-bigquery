@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-redis
+  labels: &RedisStatefulSetLabels
+    app: {{ .Release.Name }}
+    name: {{ .Release.Name }}
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels: *RedisStatefulSetLabels
+  serviceName: {{ .Release.Name }}-redis-service
+  template:
+    metadata:
+      labels: *RedisStatefulSetLabels
+    spec:
+      containers:
+      - image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+        name: redis
+        args:
+        - "--requirepass"
+        - "$(REDIS_PASSWORD)"
+        - "--dir"
+        - "/data"
+        - "--appendonly"
+        - "yes"
+        - "--save"
+        - "$(REDIS_SAVE_INTERVAL)"
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-redis-secret
+              key: redis-password
+        - name: REDIS_SAVE_INTERVAL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Release.Name }}-redis-config
+              key: save-interval
+        - name: REDIS_ADDR
+          value: "localhost"
+        ports:
+        - name: redis
+          containerPort: 6379
+        volumeMounts:
+        - name: {{ .Release.Name }}-redis-data-pvc
+          mountPath: /data
+        - name: health
+          mountPath: /health
+        livenessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+          exec:
+            command:
+            - sh
+            - -c
+            - /health/redis_ping_liveness_local.sh 1
+        readinessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 5
+          exec:
+            command:
+            - sh
+            - -c
+            - /health/redis_ping_readiness_local.sh 1
+      volumes:
+       - name: health
+         configMap:
+            name: {{ .Release.Name }}-redis-config
+            defaultMode: 0755
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Release.Name }}-redis-data-pvc
+      labels:
+        name: {{ .Release.Name }}
+        app: {{ .Release.Name }}
+        component: redis
+    spec:
+      accessModes:
+      - {{ .Values.redis.persistence.accessMode }}
+      storageClassName: {{ .Values.redis.persistence.storageClass }}
+      resources:
+        requests:
+          storage: {{ .Values.redis.persistence.size }}

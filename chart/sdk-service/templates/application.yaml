@@ -57,5 +57,7 @@ spec:
       kind: Service
     - group: apps/v1
       kind: Deployment
+    - group: apps/v1
+      kind: StatefulSet
     - group: app.k8s.io/v1beta1
       kind: BackendConfig
