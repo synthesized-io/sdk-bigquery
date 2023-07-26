@@ -80,10 +80,15 @@ properties:
     type: string
     title: StorageClass
     description: You can choose an existing StorageClass or create a new one. The newly created StorageClass provisioner will be "pd-ssd".
+    default: "standard"
     x-google-marketplace:
       type: STORAGE_CLASS
       storageClass:
         type: SSD
+  redis.replicas:
+    type: integer
+    title: The number of Redis Pod replicas
+    default: 1
 
   # Generated values
   flower.serviceAccount:
@@ -132,6 +137,4 @@ properties:
 required:
   - name
   - namespace
-  - redis.persistence.size
-  - redis.persistence.storageClass
   - redis.replicas
