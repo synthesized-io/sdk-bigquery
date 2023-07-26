@@ -18,7 +18,7 @@ spec:
       securityContext:
         {{- toYaml .Values.containerSecurityContext | nindent 8 }}
       {{- end }}
-      serviceAccountName: "{{ .Values.worker.serviceAccount }}"
+      serviceAccountName: "{{ .Values.serviceAccount }}"
       containers:
         - name: worker
           image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag }}"

@@ -91,13 +91,13 @@ properties:
     default: 1
 
   # Generated values
-  flower.serviceAccount:
+  serviceAccount:
     type: string
-    title: Service account used by the Flower instance
+    title: Service account used by all instances
     x-google-marketplace:
       type: SERVICE_ACCOUNT
       serviceAccount:
-        description: Service account used by Flower StatefulSet
+        description: Service account used by all instances
         roles:
           - type: ClusterRole
             rulesType: CUSTOM
@@ -105,20 +105,6 @@ properties:
               - apiGroups: [""]
                 resources: ["nodes","pods","services"]
                 verbs: ["get", "list", "watch"]
-  worker.serviceAccount:
-    type: string
-    title: Service account used by each Worker instance
-    x-google-marketplace:
-      type: SERVICE_ACCOUNT
-      serviceAccount:
-        description: Service account used by Worker Deployment
-        roles:
-          - type: ClusterRole
-            rulesType: CUSTOM
-            rules:
-              - apiGroups: [ "" ]
-                resources: [ "nodes","pods","services" ]
-                verbs: [ "get", "list", "watch" ]
   redis.password:
     type: string
     x-google-marketplace:
