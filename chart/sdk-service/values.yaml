@@ -55,7 +55,7 @@ worker:
   #    cpu: 0.5
   #    memory: 1Gi
 
-  replicas: 2
+  maxReplicas: 2
 
 serviceAccount:
 

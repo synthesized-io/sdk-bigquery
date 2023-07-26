@@ -11,6 +11,6 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ .Release.Name }}-worker
-  minReplicas: 2
-  maxReplicas: {{ .Values.worker.replicas }}
+  minReplicas: 1
+  maxReplicas: {{ .Values.worker.maxReplicas }}
   targetCPUUtilizationPercentage: 50

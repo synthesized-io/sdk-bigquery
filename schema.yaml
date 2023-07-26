@@ -70,6 +70,10 @@ properties:
     title: Memory limit for each worker instance
     description: Not set by default. If you'd like a custom value, you can specify an override here.
     pattern: '^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$'
+  worker.maxReplicas:
+    type: integer
+    title: The maximal number of Celery worker replicas
+    default: 2
   redis.persistence.size:
     type: string
     title: Redis storage size
@@ -85,10 +89,6 @@ properties:
       type: STORAGE_CLASS
       storageClass:
         type: SSD
-  redis.replicas:
-    type: integer
-    title: The number of Redis Pod replicas
-    default: 1
 
   # Generated values
   serviceAccount:

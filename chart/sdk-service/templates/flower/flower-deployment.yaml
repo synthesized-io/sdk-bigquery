@@ -38,7 +38,7 @@ spec:
               path: /api
               port: http
             initialDelaySeconds: 5
-            periodSeconds: 5
+            periodSeconds: 30
             timeoutSeconds: 30
             # 1 seconds * 180 = 3 minutes
             failureThreshold: 180
