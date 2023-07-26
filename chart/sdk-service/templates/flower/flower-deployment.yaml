@@ -18,7 +18,7 @@ spec:
       securityContext:
         {{- toYaml .Values.containerSecurityContext | nindent 8 }}
       {{- end }}
-      serviceAccountName: "{{ .Values.serviceAccount }}"
+      serviceAccountName: "{{ .Values.flower.serviceAccount }}"
       containers:
         - name: flower
           image: "{{ .Values.flower.image.repository }}:{{ .Values.flower.image.tag }}"
@@ -51,4 +51,4 @@ spec:
             # 1 seconds * 180 = 3 minutes
             failureThreshold: 180
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.flower.resources | nindent 12 }}

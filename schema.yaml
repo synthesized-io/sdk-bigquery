@@ -18,6 +18,24 @@ x-google-marketplace:
           type: REPO_WITH_REGISTRY
         image.tag:
           type: TAG
+    flower:
+      properties:
+        flower.image.repository:
+          type: REPO_WITH_REGISTRY
+        flower.image.tag:
+          type: TAG
+    redis:
+      properties:
+        redis.image.repository:
+          type: REPO_WITH_REGISTRY
+        redis.image.tag:
+          type: TAG
+    worker:
+      properties:
+        worker.image.repository:
+          type: REPO_WITH_REGISTRY
+        worker.image.tag:
+          type: TAG
 
 properties:
   name:
@@ -28,46 +46,80 @@ properties:
     type: string
     x-google-marketplace:
       type: NAMESPACE
-  envRenderSecret.SYNTHESIZED_KEY:
-    title: Synthesized Licence Key
+  flower.resources.limits.cpu:
     type: string
+    default: null
+    title: CPU limit for the Flower instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([m]?)$'
+  flower.resources.limits.memory:
+    type: string
+    default: null
+    title: Memory limit for the Flower instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$'
+  worker.resources.limits.cpu:
+    type: string
+    default: null
+    title: CPU limit for each worker instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([m]?)$'
+  worker.resources.limits.memory:
+    type: string
+    default: null
+    title: Memory limit for each worker instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$'
+  redis.persistence.size:
+    type: string
+    title: Redis storage size
+    description: Storage size for Redis persistent volume
+    default: '1Gi'
+    pattern: '^[1-9][0-9]*(\.[0-9]+)?[TGM]i?$'
+  redis.persistence.storageClass:
+    type: string
+    title: StorageClass
+    description: You can choose an existing StorageClass or create a new one. The newly created StorageClass provisioner will be "pd-ssd".
     x-google-marketplace:
-      type: MASKED_FIELD
-  serviceAccount:
+      type: STORAGE_CLASS
+      storageClass:
+        type: SSD
+
+  # Generated values
+  flower.serviceAccount:
     type: string
-    title: SDK Jupyter Service Account
+    title: Service account used by the Flower instance
     x-google-marketplace:
       type: SERVICE_ACCOUNT
       serviceAccount:
-        description: Service account used by SDK Jupyter deployment
+        description: Service account used by Flower StatefulSet
+        roles:
+          - type: ClusterRole
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["nodes","pods","services"]
+                verbs: ["get", "list", "watch"]
+  worker.serviceAccount:
+    type: string
+    title: Service account used by each Worker instance
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: Service account used by Worker Deployment
         roles:
           - type: ClusterRole
             rulesType: CUSTOM
             rules:
               - apiGroups: [ "" ]
-                resources: [ "pods", "serviceaccounts" ]
-                verbs: [ "get", "list" ]
-              - apiGroups: [ "extensions" ]
-                resources: [ "deployments" ]
-                verbs: [ "get", "list" ]
-              - apiGroups: [ "apps" ]
-                resources: [ "deployments" ]
-                verbs: [ "get", "list" ]
-              - apiGroups: [ "" ]
-                resources: [ "pods/exec" ]
-                verbs: [ "create", "get" ]
-  resources.limits.cpu:
+                resources: [ "nodes","pods","services" ]
+                verbs: [ "get", "list", "watch" ]
+  redis.password:
     type: string
-    default: null
-    title: CPU limit for each server instance
-    description: Not set by default. If you'd like a custom value, you can specify an override here.
-    pattern: '^([+-]?[0-9.]+)([m]?)$'
-  resources.limits.memory:
-    type: string
-    default: null
-    title: Memory limit for each server instance
-    description: Not set by default. If you'd like a custom value, you can specify an override here.
-    pattern: '^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$'
+    x-google-marketplace:
+      type: GENERATED_PASSWORD
+      generatedPassword:
+        length: 32
   certificate:
     type: string
     x-google-marketplace:
@@ -80,4 +132,6 @@ properties:
 required:
   - name
   - namespace
-
+  - redis.persistence.size
+  - redis.persistence.storageClass
+  - redis.replicas
