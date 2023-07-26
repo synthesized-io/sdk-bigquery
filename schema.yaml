@@ -123,4 +123,3 @@ properties:
 required:
   - name
   - namespace
-  - redis.replicas
