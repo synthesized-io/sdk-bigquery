@@ -9,6 +9,7 @@ metadata:
 spec:
   selector:
     matchLabels: *WorkerDeploymentLabels
+  replicas: {{ .Values.worker.replicas }}
   template:
     metadata:
       labels: *WorkerDeploymentLabels

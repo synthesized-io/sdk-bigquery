@@ -70,10 +70,10 @@ properties:
     title: Memory limit for each worker instance
     description: Not set by default. If you'd like a custom value, you can specify an override here.
     pattern: '^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$'
-  worker.maxReplicas:
+  worker.replicas:
     type: integer
     title: The maximal number of Celery worker replicas
-    default: 2
+    default: 1
   redis.persistence.size:
     type: string
     title: Redis storage size
