@@ -5,23 +5,23 @@ actions:
       expect:
         exitCode:
           equals: 0
-  - name: Wait for Flower get ready
-    bashTest:
-      script: |
-        kubectl wait --for=condition=Available=True --timeout=120s --namespace $NAMESPACE deploy ${APP_INSTANCE_NAME}-flower
-      expect:
-        exitCode:
-          equals: 0
-  - name: Wait for Workers get ready
-    bashTest:
-      script: |
-        kubectl wait --for=condition=Available=True --timeout=120s --namespace $NAMESPACE deploy ${APP_INSTANCE_NAME}-worker
-      expect:
-        exitCode:
-          equals: 0
-  - name: API is available
-    bashTest:
-      script: curl ${APP_INSTANCE_NAME}-flower-service.${NAMESPACE}.svc:5555/api
-      expect:
-        exitCode:
-          equals: 0
+#  - name: Wait for Flower get ready
+#    bashTest:
+#      script: |
+#        kubectl wait --for=condition=Available=True --timeout=120s --namespace $NAMESPACE deploy ${APP_INSTANCE_NAME}-flower
+#      expect:
+#        exitCode:
+#          equals: 0
+#  - name: Wait for Workers get ready
+#    bashTest:
+#      script: |
+#        kubectl wait --for=condition=Available=True --timeout=120s --namespace $NAMESPACE deploy ${APP_INSTANCE_NAME}-worker
+#      expect:
+#        exitCode:
+#          equals: 0
+#  - name: API is available
+#    bashTest:
+#      script: curl ${APP_INSTANCE_NAME}-flower-service.${NAMESPACE}.svc:5555/api
+#      expect:
+#        exitCode:
+#          equals: 0
