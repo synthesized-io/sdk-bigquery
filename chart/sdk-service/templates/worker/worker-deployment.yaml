@@ -28,5 +28,7 @@ spec:
             - "worker"
             - "--loglevel=info"
           env:
-            - name: REDIS_SERVER
+            - name: CELERY_BROKER_URL
+              value: "redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
+            - name: CELERY_BACKEND_URL
               value: "redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
