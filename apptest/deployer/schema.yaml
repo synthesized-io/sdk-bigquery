@@ -1,6 +1,6 @@
 properties:
   testerImage:
     type: string
-    default: $REGISTRY/tester:$TAG
+    default: $REGISTRY/$APP_INSTANCE_NAME/tester:$TAG
     x-google-property:
       type: IMAGE
