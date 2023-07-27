@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     uuid-runtime \
     wget \
     curl \
+    redis-server \
     && rm -rf /var/lib/apt/lists/*
 
 RUN wget -q -O /bin/kubectl \
