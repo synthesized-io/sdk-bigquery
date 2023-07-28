@@ -19,14 +19,14 @@ actions:
 
 - name: Try to set an item to Redis
   bashTest:
-    script: redis-cli -h ${APP_INSTANCE_NAME}-redis-service -a ${REDIS_PASSWORD} SET mykey 'PING'
+    script: redis-cli -h ${APP_INSTANCE_NAME}-redis-service -a ${REDIS_PASSWORD} set mykey "PING"
     expect:
       stdout:
         contains: 'OK'
 
 - name: Try to get an item from Redis
   bashTest:
-    script: redis-cli -h ${APP_INSTANCE_NAME}-redis-service -a ${REDIS_PASSWORD} GET mykey
+    script: redis-cli -h ${APP_INSTANCE_NAME}-redis-service -a ${REDIS_PASSWORD} get mykey
     expect:
       stdout:
         contains: 'PING'
