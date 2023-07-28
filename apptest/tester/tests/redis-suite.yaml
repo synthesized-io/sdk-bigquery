@@ -1,16 +1,16 @@
 actions:
 - name: Check success authentication
   bashTest:
-    script: redis-cli -h ${APP_INSTANCE_NAME}-redis-service -a ${REDIS_PASSWORD} ping
+    script: redis-cli -h ${APP_INSTANCE_NAME}-redis-service -a ${REDIS_PASSWORD} info keyspace
     expect:
       stdout:
-        contains: 'PONG'
+        match: "keys"
       exitCode:
         equals: 0
 
 - name: Check bad authentication
   bashTest:
-    script: redis-cli -h ${APP_INSTANCE_NAME}-redis-service -a wrongpassword ping
+    script: redis-cli -h ${APP_INSTANCE_NAME}-redis-service -a wrongpassword info keyspace
     expect:
       exitCode:
         equals: 0
