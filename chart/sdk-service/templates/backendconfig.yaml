@@ -7,6 +7,4 @@ metadata:
     name: {{ .Release.Name }}
 spec:
   healthCheck:
-    # Jupyter responds with code 302 on "/" which the default healthcheck path,
-    # so override it with something that is known to respond 200 without authentication.
     requestPath: "/api"
