@@ -1,10 +1,10 @@
 ARG MARKETPLACE_TOOLS_TAG
+
+FROM marketplace.gcr.io/google/c2d-debian11 AS build
+
 ARG CHART_NAME
 ARG REGISTRY
 ARG TAG
-ARG CHART_NAME
-
-FROM marketplace.gcr.io/google/c2d-debian11 AS build
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gettext
@@ -30,6 +30,8 @@ RUN cat /tmp/apptest/schema.yaml \
     && mv /tmp/apptest/schema.yaml.new /tmp/apptest/schema.yaml
 
 FROM gcr.io/cloud-marketplace-tools/k8s/deployer_helm:$MARKETPLACE_TOOLS_TAG
+
+ARG CHART_NAME
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends dnsutils netcat \
