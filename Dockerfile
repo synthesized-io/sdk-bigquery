@@ -1,8 +1,10 @@
 ARG MARKETPLACE_TOOLS_TAG
+ARG CHART_NAME
+ARG REGISTRY
+ARG TAG
+ARG CHART_NAME
 
 FROM marketplace.gcr.io/google/c2d-debian11 AS build
-
-ARG CHART_NAME
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gettext
@@ -15,9 +17,6 @@ RUN cd /tmp/test \
     && tar -czvf /tmp/test/$CHART_NAME.tar.gz chart/
 
 ADD schema.yaml /tmp/schema.yaml
-
-ARG REGISTRY
-ARG TAG
 
 RUN cat /tmp/schema.yaml \
     | env -i "REGISTRY=$REGISTRY" "TAG=$TAG" envsubst \
@@ -35,8 +34,6 @@ FROM gcr.io/cloud-marketplace-tools/k8s/deployer_helm:$MARKETPLACE_TOOLS_TAG
 RUN apt-get update \
     && apt-get install -y --no-install-recommends dnsutils netcat \
     && rm -rf /var/lib/apt/lists/*
-
-ARG CHART_NAME
 
 COPY --from=build /tmp/$CHART_NAME.tar.gz /data/chart/
 COPY --from=build /tmp/test/$CHART_NAME.tar.gz /data-test/chart/

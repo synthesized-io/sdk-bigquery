@@ -37,7 +37,7 @@ gcloud auth configure-docker
 
 #### Creating a Google Kubernetes Engine (GKE) cluster
 
-Create a new cluster from the command line:
+Create a new cluster from the command line (you can change values of the properties CLUSTER and ZONE):
 
 ```shell
 export CLUSTER=sdk-cluster
@@ -86,11 +86,11 @@ community. You can find the source code at
 
 Choose an instance name and
 [namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
-for the app. In most cases, you can use the `default` namespace.
+for the app.
 
 ```shell
 export APP_INSTANCE_NAME=sdk-service
-export NAMESPACE=default
+export NAMESPACE=synthesized-sdk
 ```
 
 Set up the image tag.
@@ -141,14 +141,14 @@ kubectl create clusterrole "${SDK_SERVICE_ACCOUNT}-role" --verb=get,list,watch -
 kubectl create clusterrolebinding "${SDK_SERVICE_ACCOUNT}-rule" --clusterrole="${SDK_SERVICE_ACCOUNT}-role" --serviceaccount="${NAMESPACE}:${SDK_SERVICE_ACCOUNT}"
 ```
 
-Set or generate the password for the GitLab services:
+Set or generate the password for Redis:
 
 ```shell
 # Generate password for Redis
 export REDIS_ROOT_PASSWORD="$(openssl rand -base64 12)"
 ```
 
-For persistent disk provisioning of the GitLab StatefulSets, you will need to
+For persistent disk provisioning of the Redis StatefulSet, you will need to
 specify the StorageClass name, or create a new StorageClass.
 
 To check your available options, use the following command:
