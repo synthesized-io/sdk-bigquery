@@ -28,24 +28,14 @@ spec:
       Flower Webserver, you can either expose a public service endpoint, or keep it private, but connect
       from your local environment with `kubectl port-forward`.
 
-      ## Forward the Webserver port in your local environment
-
-      To use `kubectl`'s port forwarding feature to forward port to your local
-      machine, run the following command in the background:
+      To get the external IP address of your Flower Web Server, use the following
 
       ```shell
-      kubectl port-forward \
-        --namespace {{ .Release.Namespace }} \
-        svc/{{ .Release.Name }}-flower-service \
-        5555:555
+      SERVICE_IP="$(kubectl get "service/{{ .Release.Name }}-flower-service" \
+      --namespace {{ .Release.Namespace }} \
+      --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+      echo "http://${SERVICE_IP}/"
       ```
-
-      Now you can access the Flower UI with [http://localhost:5555](http://localhost:5555).
-  info:
-    - name: Forward Flower Webserver port locally
-      value: kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ .Release.Name }}-flower-service 5555:5555
-    - name: Flower Webserver address (local only)
-      value: "http://localhost:5555/"
   selector:
     matchLabels:
       name: {{ .Release.Name }}

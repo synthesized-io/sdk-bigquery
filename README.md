@@ -211,13 +211,14 @@ To view the app, open the URL in your browser.
 
 ### Accessing the Flower User Interface
 
-You can expose Flower Web Server port:
+To get the external IP address of your Flower Web Server, use the following
+command:
 
 ```shell
-kubectl port-forward \
-    --namespace "${NAMESPACE}" \
-    svc/${APP_INSTANCE_NAME}-flower-service \
-    5555:5555
+SERVICE_IP="$(kubectl get "service/${APP_INSTANCE_NAME}-flower-service" \
+          --namespace "${NAMESPACE}" \
+          --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+echo "http://${SERVICE_IP}/"
 ```
 
 # Using the app
