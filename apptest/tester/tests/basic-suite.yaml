@@ -21,7 +21,7 @@ actions:
           equals: 0
   - name: API is available
     bashTest:
-      script: curl ${APP_INSTANCE_NAME}-flower-service.${NAMESPACE}.svc:{{ .Values.flower.httpPort | int }}/metrics
+      script: curl ${APP_INSTANCE_NAME}-flower-service.${NAMESPACE}.svc:{{ .Values.flower.httpPort | int }}/healthcheck
       expect:
         exitCode:
           equals: 0
