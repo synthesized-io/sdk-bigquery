@@ -35,7 +35,7 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /api
+              path: /metrics
               port: http
             initialDelaySeconds: 5
             periodSeconds: 30
