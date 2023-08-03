@@ -1,0 +1,125 @@
+x-google-marketplace:
+  schemaVersion: v2
+
+  applicationApiVersion: v1beta1
+
+  publishedVersion: "$TAG"
+  publishedVersionMetadata:
+    releaseNote: >-
+      Initial release.
+    releaseTypes:
+      - Feature
+    recommended: false
+
+  images:
+    '':
+      properties:
+        image.repository:
+          type: REPO_WITH_REGISTRY
+        image.tag:
+          type: TAG
+    flower:
+      properties:
+        flower.image.repository:
+          type: REPO_WITH_REGISTRY
+        flower.image.tag:
+          type: TAG
+    redis:
+      properties:
+        redis.image.repository:
+          type: REPO_WITH_REGISTRY
+        redis.image.tag:
+          type: TAG
+    worker:
+      properties:
+        worker.image.repository:
+          type: REPO_WITH_REGISTRY
+        worker.image.tag:
+          type: TAG
+
+properties:
+  name:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  namespace:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  flower.resources.limits.cpu:
+    type: string
+    default: null
+    title: CPU limit for the Flower instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([m]?)$'
+  flower.resources.limits.memory:
+    type: string
+    default: null
+    title: Memory limit for the Flower instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$'
+  worker.resources.limits.cpu:
+    type: string
+    default: null
+    title: CPU limit for each worker instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([m]?)$'
+  worker.resources.limits.memory:
+    type: string
+    default: null
+    title: Memory limit for each worker instance
+    description: Not set by default. If you'd like a custom value, you can specify an override here.
+    pattern: '^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$'
+  worker.replicas:
+    type: integer
+    title: The maximal number of Celery worker replicas
+    default: 1
+  redis.persistence.size:
+    type: string
+    title: Redis storage size
+    description: Storage size for Redis persistent volume
+    default: '1Gi'
+    pattern: '^[1-9][0-9]*(\.[0-9]+)?[TGM]i?$'
+  redis.persistence.storageClass:
+    type: string
+    title: StorageClass
+    description: You can choose an existing StorageClass or create a new one. The newly created StorageClass provisioner will be "pd-ssd".
+    default: "standard"
+    x-google-marketplace:
+      type: STORAGE_CLASS
+      storageClass:
+        type: SSD
+
+  # Generated values
+  serviceAccount:
+    type: string
+    title: Service account used by all instances
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        description: Service account used by all instances
+        roles:
+          - type: ClusterRole
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["nodes","pods","services"]
+                verbs: ["get", "list", "watch"]
+  redis.password:
+    type: string
+    x-google-marketplace:
+      type: GENERATED_PASSWORD
+      generatedPassword:
+        length: 32
+  certificate:
+    type: string
+    x-google-marketplace:
+      type: TLS_CERTIFICATE
+      tlsCertificate:
+        generatedProperties:
+          base64EncodedPrivateKey: tls.base64EncodedPrivateKey
+          base64EncodedCertificate: tls.base64EncodedCertificate
+
+required:
+  - name
+  - namespace

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-flower
+  labels: &FlowerDeploymentLabels
+    app: "{{ .Release.Name }}"
+    name: "{{ .Release.Name }}"
+    component: flower
+spec:
+  selector:
+    matchLabels: *FlowerDeploymentLabels
+  replicas: 1
+  template:
+    metadata:
+      labels: *FlowerDeploymentLabels
+    spec:
+      {{- if .Values.securityContext }}
+      securityContext:
+        {{- toYaml .Values.containerSecurityContext | nindent 8 }}
+      {{- end }}
+      serviceAccountName: "{{ .Values.serviceAccount }}"
+      containers:
+        - name: flower
+          image: "{{ .Values.flower.image.repository }}:{{ .Values.flower.image.tag }}"
+          args:
+            - "celery"
+            - "--broker=redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
+            - "flower"
+          env:
+            - name: FLOWER_UNAUTHENTICATED_API
+              value: "true"
+          ports:
+            - name: http
+              containerPort: {{ .Values.flower.httpPort | int }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 30
+            # 1 seconds * 180 = 3 minutes
+            failureThreshold: 180
+          readinessProbe:
+            httpGet:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 30
+            # 1 seconds * 180 = 3 minutes
+            failureThreshold: 180
+          resources:
+            {{- toYaml .Values.flower.resources | nindent 12 }}

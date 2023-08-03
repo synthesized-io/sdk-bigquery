@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-worker
+  labels: &WorkerDeploymentLabels
+    app: "{{ .Release.Name }}"
+    name: "{{ .Release.Name }}"
+    component: worker
+spec:
+  selector:
+    matchLabels: *WorkerDeploymentLabels
+  replicas: {{ .Values.worker.replicas }}
+  template:
+    metadata:
+      labels: *WorkerDeploymentLabels
+    spec:
+      {{- if .Values.securityContext }}
+      securityContext:
+        {{- toYaml .Values.containerSecurityContext | nindent 8 }}
+      {{- end }}
+      serviceAccountName: "{{ .Values.serviceAccount }}"
+      containers:
+        - name: worker
+          image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag }}"
+          args:
+            - "celery"
+            - "-A"
+            - "app.main.celery_app"
+            - "worker"
+            - "--loglevel=info"
+          env:
+            - name: CELERY_BROKER_URL
+              value: "redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
+            - name: CELERY_BACKEND_URL
+              value: "redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"

@@ -1,0 +1,6 @@
+properties:
+  testerImage:
+    type: string
+    default: $REGISTRY/sdk-service/tester:$TAG
+    x-google-property:
+      type: IMAGE

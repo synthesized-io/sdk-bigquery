@@ -1,0 +1,53 @@
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: {{ .Release.Name }}
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app: {{ .Release.Name }}
+    name: {{ .Release.Name }}
+  annotations:
+    marketplace.cloud.google.com/deploy-info: '{"partner_id": "synthesized", "product_id": {{ .Chart.Name | quote }}, "partner_name": "Synthesized"}'
+spec:
+  descriptor:
+    type: SDK
+    version: "{{ .Values.image.tag }}"
+    description: |-
+      Synthesized Scientific Data Kit (SDK) is a comprehensive framework for generative modelling for structured data (tabular, time-series and event-based data). The SDK helps you create compliant statistical-preserving data snapshots for BI/Analytics and ML/AI applications. Right-size your data with AI-supported data transformations.
+      This delivery contains the SDK bundled up with Flower, Redis and SDK Celery worker nodes.
+    maintainers:
+      - name: Synthesized
+        url: https://www.synthesized.io/
+    links:
+      - description: 'User Guide'
+        url: https://github.com/synthesized-io/sdk-on-gcp/blob/main/README.md
+    notes: |-
+      # Open your web server
+
+      Flower API and UI are exposed by the ClusterIP-only service `{{ .Release.Name }}-flower-service`. To connect to the
+      Flower Webserver, you can either expose a public service endpoint, or keep it private, but connect
+      from your local environment with `kubectl port-forward`.
+
+      To get the external IP address of your Flower Web Server, use the following
+
+      ```shell
+      SERVICE_IP="$(kubectl get "service/{{ .Release.Name }}-flower-service" \
+      --namespace {{ .Release.Namespace }} \
+      --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+      echo "http://${SERVICE_IP}/"
+      ```
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}
+  addOwnerRef: true
+  componentKinds:
+    - group: v1
+      kind: Secret
+    - group: v1
+      kind: Service
+    - group: apps/v1
+      kind: Deployment
+    - group: apps/v1
+      kind: StatefulSet
+    - group: app.k8s.io/v1beta1
+      kind: BackendConfig

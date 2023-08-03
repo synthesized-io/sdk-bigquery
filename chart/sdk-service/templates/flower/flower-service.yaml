@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-flower-service
+  labels: &FlowerServiceLabels
+    app: {{ .Release.Name }}
+    name: {{ .Release.Name }}
+    component: flower
+  annotations:
+    cloud.google.com/backend-config: '{"default": "{{ .Release.Name }}-backendconfig"}'
+    cloud.google.com/load-balancer-type: "Internal"
+spec:
+  selector: *FlowerServiceLabels
+  ports:
+    - name: http
+      protocol: TCP
+      port: {{ .Values.flower.httpPort | int }}
+      targetPort: {{ .Values.flower.httpPort | int }}
+  type: {{ .Values.flower.serviceType }}

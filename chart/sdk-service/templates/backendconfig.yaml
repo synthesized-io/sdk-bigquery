@@ -1,0 +1,10 @@
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: {{ .Release.Name }}-backendconfig
+  labels:
+    app: {{ .Release.Name }}
+    name: {{ .Release.Name }}
+spec:
+  healthCheck:
+    requestPath: "/healthcheck"
