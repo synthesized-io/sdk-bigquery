@@ -89,6 +89,11 @@ properties:
       type: STORAGE_CLASS
       storageClass:
         type: SSD
+  worker.envRenderSecret.SYNTHESIZED_KEY:
+    title: Synthesized Licence Key
+    type: string
+    x-google-marketplace:
+      type: MASKED_FIELD
 
   # Generated values
   serviceAccount:

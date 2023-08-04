@@ -33,3 +33,14 @@ spec:
               value: "redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
             - name: CELERY_BACKEND_URL
               value: "redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
+          {{- range $key, $val := .Values.worker.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+          {{- end }}
+          envFrom:
+            - secretRef:
+              {{- if .Values.worker.secretRef}}
+                name: {{ .Values.worker.secretRef }}
+              {{- else}}
+                name: {{ .Release.Name }}-worker-secret
+              {{- end}}
