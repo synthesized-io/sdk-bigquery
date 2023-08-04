@@ -22,12 +22,6 @@ spec:
       containers:
         - name: worker
           image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag }}"
-          args:
-            - "celery"
-            - "-A"
-            - "worker.main"
-            - "worker"
-            - "--loglevel=info"
           env:
             - name: CELERY_BROKER_URL
               value: "redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
