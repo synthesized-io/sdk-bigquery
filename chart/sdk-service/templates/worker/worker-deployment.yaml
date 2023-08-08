@@ -33,3 +33,30 @@ spec:
               value: "redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
             - name: CELERY_BACKEND_URL
               value: "redis://:{{ .Values.redis.password }}@{{ .Release.Name }}-redis-service:6379"
+            - name: UBBAGENT_PORT
+              value: "{{ .Values.ubbagent.port }}"
+
+        - name: ubbagent
+          image: "{{ .Values.ubbagent.image.repository }}:{{ .Values.ubbagent.image.tag }}"
+          env:
+            - name: AGENT_CONFIG_FILE
+              value: {{ .Values.ubbagent.configPath }}
+            - name: AGENT_ENCODED_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.reportingSecret }}
+                  key: reporting-key
+            - name: AGENT_CONSUMER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.reportingSecret }}
+                  key: consumer-id
+            - name: AGENT_LOCAL_PORT
+              value: "{{ .Values.ubbagent.port }}"
+          volumeMounts:
+            - name: ubbagent-config
+              mountPath: {{ .Values.ubbagent.configPath }}
+      volumes:
+        - name: ubbagent-config
+          configMap:
+            name: ubbagent-configmap

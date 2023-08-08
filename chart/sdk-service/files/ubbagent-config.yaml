@@ -1,0 +1,45 @@
+# The identity section contains authentication information used by the agent.
+identities:
+  - name: gcp
+    gcp:
+      # A base64-encoded service account key used to report usage to
+      # Google Service Control.
+      encodedServiceAccountKey: $AGENT_ENCODED_KEY
+
+# The metrics section defines the metric names and types that the agent
+# is configured to record.
+metrics:
+  - name: instance-seconds
+    type: int
+    # The empty passthrough second indicates that no aggregation should occur for this metric.
+    # Reports received are immediately sent to the reporting endpoint.
+    passthrough: {}
+    endpoints:
+      - name: on_disk, service_control
+
+# The endpoints section defines where metering data is ultimately sent. Currently
+# supported endpoints include:
+# * disk - some directory on the local filesystem
+# * servicecontrol - Google Service Control: https://cloud.google.com/service-control/overview
+endpoints:
+  - name: on_disk
+    disk:
+      reportDir: /var/ubbagent/reports
+      expireSeconds: 3600
+  - name: servicecontrol
+    servicecontrol:
+      identity: gcp
+      serviceName: some-service-name.myapi.com
+      consumerId: $AGENT_CONSUMER_ID
+
+# The sources section lists metric data sources run by the agent itself. The currently-supported
+# source is 'heartbeat', which sends a defined value to a metric at a defined interval.
+sources:
+  - name: instance-seconds
+    heartbeat:
+      metric: instance-seconds
+      intervalSeconds: 5
+      value:
+        int64Value: 5
+      labels:
+        auto: true

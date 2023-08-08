@@ -180,7 +180,7 @@ helm template chart/sdk-service \
   --set redis.image.tag="${TAG}" \
   --set worker.image.repository="${IMAGE_WORKER}" \
   --set worker.image.tag="${TAG}" \
-  --set redis.password="${REDIS_ROOT_PASSWORD}" \
+  --set-string redis.password="${REDIS_ROOT_PASSWORD}" \
   --set redis.persistence.storageClass="${REDIS_STORAGE_CLASS}" \
   --set redis.persistence.size="${REDIS_PERSISTENCE_SIZE_GB}" \
   --set worker.replicas="${WORKER_REPLICAS}" \

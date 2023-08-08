@@ -119,6 +119,10 @@ properties:
         generatedProperties:
           base64EncodedPrivateKey: tls.base64EncodedPrivateKey
           base64EncodedCertificate: tls.base64EncodedCertificate
+  reportingSecret:
+    type: string
+    x-google-marketplace:
+      type: REPORTING_SECRET
 
 required:
   - name

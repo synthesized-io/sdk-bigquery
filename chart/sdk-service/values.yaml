@@ -63,6 +63,13 @@ worker:
 
   replicas: 1
 
+ubbagent:
+  image:
+    repository:
+    tag:
+  port: 3456
+  configPath: /etc/ubbagent/config.yaml
+
 serviceAccount:
 
 securityContext: {}
