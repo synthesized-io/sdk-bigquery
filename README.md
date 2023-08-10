@@ -37,13 +37,14 @@ gcloud auth configure-docker
 
 #### Creating a Google Kubernetes Engine (GKE) cluster
 
-Create a new cluster from the command line (you can change values of the properties CLUSTER and ZONE):
+Create a new cluster from the command line. Please note that the BigQuery scope is required. 
+You can change values of the properties CLUSTER and ZONE.
 
 ```shell
 export CLUSTER=sdk-cluster
 export ZONE=us-west1-a
 
-gcloud container clusters create "${CLUSTER}" --zone "${ZONE}"
+gcloud container clusters create "${CLUSTER}" --zone "${ZONE}" --scopes=gke-default,bigquery
 ```
 
 Configure `kubectl` to connect to the new cluster:
@@ -220,6 +221,8 @@ SERVICE_IP="$(kubectl get "service/${APP_INSTANCE_NAME}-flower-service" \
           --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
 echo "http://${SERVICE_IP}/"
 ```
+
+> **_NOTE:_**  The "external" IP address will be internal to the VPC, so the service is not accessible from the outside.
 
 # Using the app
 
