@@ -42,7 +42,7 @@ redis:
 
   persistence:
     storageClass: standard
-    size: 1Gi
+    size: 128Mi
 
 worker:
   image:

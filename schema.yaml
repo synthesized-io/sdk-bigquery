@@ -78,7 +78,7 @@ properties:
     type: string
     title: Redis storage size
     description: Storage size for Redis persistent volume
-    default: '1Gi'
+    default: '128Mi'
     pattern: '^[1-9][0-9]*(\.[0-9]+)?[TGM]i?$'
   redis.persistence.storageClass:
     type: string
