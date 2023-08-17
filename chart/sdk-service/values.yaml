@@ -42,7 +42,7 @@ redis:
 
   persistence:
     storageClass: standard
-    size: 1Gi
+    size: 128Mi
 
 worker:
   image:
@@ -62,6 +62,22 @@ worker:
   #    memory: 1Gi
 
   replicas: 1
+
+  # -- Environment variables
+  env: { }
+
+  # -- Sensitive environment variables that will be rendered as a new secret object
+  envRenderSecret: { }
+
+  # -- Pass the configuration directives and envRenderSecret through Helm's templating engine.
+  ## ref: https://helm.sh/docs/developing_charts/#using-the-tpl-function
+  tplConfig: false
+
+  # -- Reference to an external secret that contains sensitive environment variables
+  # This option is useful to avoid store sensitive values in Git. You need to create the secret manually and reference it.
+  # If secretRef is used, the envRenderSecret parameter will be omitted (in case that it has content).
+  secretRef:
+
 
 serviceAccount:
 

@@ -37,13 +37,14 @@ gcloud auth configure-docker
 
 #### Creating a Google Kubernetes Engine (GKE) cluster
 
-Create a new cluster from the command line (you can change values of the properties CLUSTER and ZONE):
+Create a new cluster from the command line. Please note that the BigQuery scope is required. 
+You can change values of the properties CLUSTER and ZONE.
 
 ```shell
 export CLUSTER=sdk-cluster
 export ZONE=us-west1-a
 
-gcloud container clusters create "${CLUSTER}" --zone "${ZONE}"
+gcloud container clusters create "${CLUSTER}" --zone "${ZONE}" --scopes=gke-default,bigquery
 ```
 
 Configure `kubectl` to connect to the new cluster:
@@ -116,7 +117,7 @@ export IMAGE_WORKER="${IMAGE_REGISTRY}/worker"
 export FLOWER_RESOURCES_LIMITS_CPU=0.5
 export FLOWER_RESOURCES_LIMITS_MEMORY=512Mi
 
-export REDIS_DISK_SIZE_GB=1Gi
+export REDIS_DISK_SIZE=128Mi
 
 export WORKER_REPLICAS=1
 export WORKER_RESOURCES_LIMITS_CPU=0.5
@@ -182,7 +183,7 @@ helm template chart/sdk-service \
   --set worker.image.tag="${TAG}" \
   --set redis.password="${REDIS_ROOT_PASSWORD}" \
   --set redis.persistence.storageClass="${REDIS_STORAGE_CLASS}" \
-  --set redis.persistence.size="${REDIS_PERSISTENCE_SIZE_GB}" \
+  --set redis.persistence.size="${REDIS_DISK_SIZE}" \
   --set worker.replicas="${WORKER_REPLICAS}" \
   --set flower.resources.limits.cpu="${FLOWER_RESOURCES_LIMITS_CPU}" \
   --set flower.resources.limits.memory="${FLOWER_RESOURCES_LIMITS_MEMORY}" \
@@ -220,6 +221,8 @@ SERVICE_IP="$(kubectl get "service/${APP_INSTANCE_NAME}-flower-service" \
           --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
 echo "http://${SERVICE_IP}/"
 ```
+
+> **_NOTE:_**  The "external" IP address will be internal to the VPC, so the service is not accessible from the outside.
 
 # Using the app
 
