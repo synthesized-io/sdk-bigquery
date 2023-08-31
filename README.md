@@ -10,16 +10,21 @@ Available on the GCP Cloud Marketplace: https://console.cloud.google.com/marketp
 
 # Installation
 
-## Quick install with Google Cloud Marketplace
+## Deploy Kubernetes resources
+
+### Quick install with Google Cloud Marketplace
 
 To install Synthesized SDK Service to a Google Kubernetes Engine cluster via Google Cloud Marketplace, follow the
 [on-screen instructions](https://console.cloud.google.com/marketplace/product/synthesized-marketplace-public/synthesized-sdk-service).
 
-## Command-line instructions
+### Command-line instructions
 
-### Prerequisites
+> **_NOTE:_**  The CLI installation is only available if you have successfully deployed SDK from the marketplace
+> and reporting service key was generated.
 
-#### Setting up command-line tools
+#### Prerequisites
+
+##### Setting up command-line tools
 
 You need the following tools in your development environment:
 
@@ -35,9 +40,9 @@ Configure `gcloud` as a Docker credential helper:
 gcloud auth configure-docker
 ```
 
-#### Creating a Google Kubernetes Engine (GKE) cluster
+##### Creating a Google Kubernetes Engine (GKE) cluster
 
-Create a new cluster from the command line. Please note that the BigQuery scope is required. 
+Create a new cluster from the command line. Please note that the BigQuery scope is required.
 You can change values of the properties CLUSTER and ZONE.
 
 ```shell
@@ -53,7 +58,7 @@ Configure `kubectl` to connect to the new cluster:
 gcloud container clusters get-credentials "${CLUSTER}" --zone "${ZONE}"
 ```
 
-#### Cloning this repo
+##### Cloning this repo
 
 Clone this repo, as well as its associated tools repo:
 
@@ -61,7 +66,7 @@ Clone this repo, as well as its associated tools repo:
 git clone --recursive https://github.com/synthesized-io/sdk-bigquery.git
 ```
 
-#### Installing the Application resource definition
+##### Installing the Application resource definition
 
 An Application resource is a collection of individual Kubernetes
 components, such as Services, Deployments, and so on, that you can
@@ -81,9 +86,9 @@ The Application resource is defined by the
 community. You can find the source code at
 [github.com/kubernetes-sigs/application](https://github.com/kubernetes-sigs/application).
 
-### Installing the app
+#### Installing the app
 
-#### Configuring the app with environment variables
+##### Configuring the app with environment variables
 
 Choose an instance name and
 [namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
@@ -131,7 +136,7 @@ running the following command:
 kubectl create namespace "${NAMESPACE}"
 ```
 
-#### Creating the Service Account
+##### Creating the Service Account
 
 To create the Service Account and ClusterRoleBinding:
 
@@ -165,7 +170,7 @@ For steps to create a new StorageClass, refer to the
 export REDIS_STORAGE_CLASS="standard" # provide your StorageClass name if not "standard"
 ```
 
-#### Expanding the manifest template
+##### Expanding the manifest template
 
 Use `helm template` to expand the template. We recommend that you save the
 expanded manifest file for future updates to your app.
@@ -189,15 +194,60 @@ helm template chart/sdk-service \
   --set flower.resources.limits.memory="${FLOWER_RESOURCES_LIMITS_MEMORY}" \
   --set worker.resources.limits.cpu="${WORKER_RESOURCES_LIMITS_CPU}" \
   --set worker.resources.limits.memory="${WORKER_RESOURCES_LIMITS_MEMORY}" \
+  --set reportingSecret="${APP_INSTANCE_NAME}-reporting-secret" \
   > "${APP_INSTANCE_NAME}_manifest.yaml"
 ```
 
-#### Applying the manifest to your Kubernetes cluster
+##### Applying the manifest to your Kubernetes cluster
 
 To apply the manifest to your Kubernetes cluster, use `kubectl`:
 
 ```shell
 kubectl apply -f "${APP_INSTANCE_NAME}_manifest.yaml" --namespace "${NAMESPACE}"
+```
+
+## Deploy cloud resources
+
+Set Kubernetes cluster parameters. Please change the values if required here and below:
+```shell
+export APP_INSTANCE_NAME=sdk-service
+export NAMESPACE=synthesized-sdk
+```
+
+Set VPC network:
+```shell
+export NETWORK=default
+```
+
+Set GCP project ID and region. Please change the values to needed:
+```shell
+export REGION=us-west1
+export PROJECT=[My Project]
+```
+
+Set external IP address of your Flower Web Server, deployed in the GKE cluster:
+
+```shell
+export CLUSTER_IP="$(kubectl get "service/${APP_INSTANCE_NAME}-flower-service" \
+          --namespace "${NAMESPACE}" \
+          --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+```
+
+Configure IP range for VPC connector to access GKE cluster from Cloud Functions. 
+Please read https://cloud.google.com/vpc/docs/serverless-vpc-access for details.
+```shell
+export VPC_CONNECTOR_RANGE=10.8.0.0/28
+```
+
+Set BigQuery dataset where to use SDK:
+```shell
+export BQ_FUNCTION_DATASET=dataset
+```
+
+Run the deployment script:
+```shell
+cd cloud
+./deploy.sh
 ```
 
 #### Viewing your app in the Google Cloud Console
@@ -210,29 +260,32 @@ echo "https://console.cloud.google.com/kubernetes/application/${ZONE}/${CLUSTER}
 
 To view the app, open the URL in your browser.
 
-### Accessing the Flower User Interface
-
-To get the external IP address of your Flower Web Server, use the following
-command:
-
-```shell
-SERVICE_IP="$(kubectl get "service/${APP_INSTANCE_NAME}-flower-service" \
-          --namespace "${NAMESPACE}" \
-          --output jsonpath='{.status.loadBalancer.ingress[0].ip}')"
-echo "http://${SERVICE_IP}/"
-```
-
-> **_NOTE:_**  The "external" IP address will be internal to the VPC, so the service is not accessible from the outside.
-
 # Using the app
 
 ## How to use SDK service
 
-//TODO
+Navigate to [BigQuery](https://console.cloud.google.com/bigquery) and make sure that `synthesize` and `check_synthesized` 
+routines exist under the specified dataset.
+
+Change the dataset, table names and [config](https://docs.synthesized.io/sdk/latest/getting_started/yaml) and run the following SQL script:
+```sql
+SELECT
+  dataset.synthesize('input_table', 'output_table', '{"synthesize": {"num_rows": 1000, "produce_nans": true}}');
+```
+
+The output should be similar to
+```json
+{"status":"success","task_id":"d15d63f5-d476-47e2-814f-f8323ca844fb"}
+```
+
+You can check the status of the task with the following script:
+```sql
+SELECT dataset.check_synthesized('d15d63f5-d476-47e2-814f-f8323ca844fb');
+```
 
 # Scaling
 
-The number of SDK Celery workers can be increased with the Helm Chart property `worker.replicas`.
+The number of SDK Celery workers can be increased with the property `worker.replicas`.
 
 # App metrics
 
@@ -240,7 +293,9 @@ At the moment, the application does not support exporting Prometheus metrics and
 
 # Uninstalling the app
 
-## Using the Google Cloud Console
+## Delete Kubernetes resources
+
+### Using the Google Cloud Console
 
 1.  In the Cloud Console, open
     [Kubernetes Applications](https://console.cloud.google.com/kubernetes/application).
@@ -249,9 +304,9 @@ At the moment, the application does not support exporting Prometheus metrics and
 
 3.  On the **Application Details** page, click **Delete**.
 
-## Using the command-line
+### Using the command-line
 
-### Preparing your environment
+#### Preparing your environment
 
 Set your installation name and Kubernetes namespace:
 
@@ -260,13 +315,13 @@ export APP_INSTANCE_NAME=sdk-service
 export NAMESPACE=default
 ```
 
-### Deleting your resources
+#### Deleting your resources
 
 > **NOTE:** We recommend using a `kubectl` version that is the same as the
 > version of your cluster. Using the same version for `kubectl` and the cluster
 > helps to avoid unforeseen issues.
 
-#### Deleting the deployment with the generated manifest file
+##### Deleting the deployment with the generated manifest file
 
 Run `kubectl` on the expanded manifest file:
 
@@ -274,13 +329,30 @@ Run `kubectl` on the expanded manifest file:
 kubectl delete -f ${APP_INSTANCE_NAME}_manifest.yaml --namespace ${NAMESPACE}
 ```
 
-#### Deleting the deployment by deleting the Application resource
+##### Deleting the deployment by deleting the Application resource
 
 If you don't have the expanded manifest file, delete the resources by using
 types and a label:
 
 ```shell
-kubectl delete application,deployment,secret,service,statefulset,backendconfig \
+kubectl delete application,deployment,secret,service,statefulset \
   --namespace ${NAMESPACE} \
   --selector name=${APP_INSTANCE_NAME}
+```
+
+## Delete cloud resources
+
+Set GCP project ID and region. Please change the values to needed:
+```shell
+export REGION=us-west1
+```
+
+Set BigQuery dataset:
+```shell
+export BQ_FUNCTION_DATASET=dataset
+```
+
+Run the script and confirm deletion:
+```shell
+./cloud/clean.sh
 ```

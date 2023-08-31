@@ -7,7 +7,6 @@ metadata:
     name: {{ .Release.Name }}
     component: flower
   annotations:
-    cloud.google.com/backend-config: '{"default": "{{ .Release.Name }}-backendconfig"}'
     cloud.google.com/load-balancer-type: "Internal"
 spec:
   selector: *FlowerServiceLabels

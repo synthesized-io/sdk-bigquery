@@ -1,0 +1,47 @@
+# Copyright 2022 Google Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+resources:
+- type: gcp-types/cloudfunctions-v2beta:projects.locations.functions
+  name: {{ env.deployment }}-synthesize-run
+  properties:
+    parent: projects/{{ env.project }}/locations/{{ properties.region }}
+    function: synthesize-run
+    buildConfig:
+      source:
+        storageSource:
+          bucket: synthesize_marketplace_cloud_functions
+          object: run_task.zip
+      entryPoint: synthesize
+      runtime: python311
+    serviceConfig:
+      vpcConnector: projects/{{ env.project }}/locations/{{ properties.region }}/connectors/{{ properties.vpcConnector }}
+      environmentVariables:
+        FLOWER_API_URL: http://{{ properties.clusterIP }}:5555
+- type: gcp-types/cloudfunctions-v2beta:projects.locations.functions
+  name: {{ env.deployment }}-synthesize-check
+  properties:
+    parent: projects/{{ env.project }}/locations/{{ properties.region }}
+    function: synthesize-check
+    buildConfig:
+      source:
+        storageSource:
+          bucket: synthesize_marketplace_cloud_functions
+          object: check_task.zip
+      entryPoint: get_task_status
+      runtime: python311
+    serviceConfig:
+      vpcConnector: projects/{{ env.project }}/locations/{{ properties.region }}/connectors/{{ properties.vpcConnector }}
+      environmentVariables:
+        FLOWER_API_URL: http://{{ properties.clusterIP }}:5555
