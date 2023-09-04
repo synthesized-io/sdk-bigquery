@@ -6,24 +6,6 @@ set -u
 export VPC_CONNECTOR=synthesized-connector
 export BQ_CONNECTION_NAME="ext-synthesized-connection"
 
-# Enable APIs for GCP services:
-gcloud services enable \
-  compute.googleapis.com \
-  deploymentmanager.googleapis.com \
-  iam.googleapis.com \
-  bigquery.googleapis.com \
-  bigqueryconnection.googleapis.com \
-  vpcaccess.googleapis.com
-
-# Create VPC connector to be able call service inside the GKE:
-gcloud compute networks vpc-access connectors create $VPC_CONNECTOR \
-   --region=$REGION \
-   --network=$NETWORK \
-   --range=$VPC_CONNECTOR_RANGE \
-   --machine-type=f1-micro \
-   --min-instances 2 \
-   --max-instances 3
-
 # Create GCP cloud functions:
 gcloud deployment-manager deployments create synthesized-deployment --template=cloud-functions.jinja \
   --properties region:$REGION,vpcConnector:$VPC_CONNECTOR,clusterIP:$CLUSTER_IP
