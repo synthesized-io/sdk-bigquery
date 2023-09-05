@@ -20,8 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-  push-sdk-service:
+  push-sdk-worker:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,7 +44,7 @@ jobs:
         id: gcr-meta
         uses: docker/metadata-action@ef25336f420be2d1a49205baf41a9b88712a65a1
         with:
-          images: ${{ env.REGISTRY }}/${{ env.APP_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.APP_NAME }}/worker
           flavor: |
             latest=false
           tags: |

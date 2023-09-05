@@ -12,12 +12,6 @@ x-google-marketplace:
     recommended: false
 
   images:
-    '':
-      properties:
-        image.repository:
-          type: REPO_WITH_REGISTRY
-        image.tag:
-          type: TAG
     flower:
       properties:
         flower.image.repository:
