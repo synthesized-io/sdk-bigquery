@@ -1,0 +1,85 @@
+name: Upload Cloud Functions Code to Google Storage
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - '*'
+    branches:
+      - 'cloud'
+
+env:
+  # GitHub variables
+  GS_CLOUD_FUNCTIONS_CODE_BUCKET: synthesized_marketplace_cloud_functions
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  upload-cloud-functions-code:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11
+ 
+      - name: Authenticate GCloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_KEY }}
+ 
+      - name: Setup GCloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Install dependencies
+        working-directory: cloud/functions
+        run: pip install -r check/requirements.txt -r run/requirements.txt
+
+      - name: Unit tests (run)
+        working-directory: cloud/functions/run
+        run: python -m unittest tests.test_main
+
+      - name: Zip code (run)
+        working-directory: cloud/functions/run
+        run: zip -r run_task.zip main.py requirements.txt
+
+      - name: Upload code (run)
+        uses: google-github-actions/upload-cloud-storage@v1
+        with:
+          path: cloud/functions/run/run_task.zip
+          destination: ${{ env.GS_CLOUD_FUNCTIONS_CODE_BUCKET }}
+          parent: false
+          predefinedAcl: publicRead
+
+      - name: Clean up (run)
+        working-directory: cloud/functions/run
+        run: rm -rf run_task.zip
+
+      - name: Upload to GS (check)
+        working-directory: cloud/functions/check
+        run: python -m unittest tests.test_main
+
+      - name: Zip code (check)
+        working-directory: cloud/functions/check
+        run: zip -r check_task.zip main.py requirements.txt
+
+      - name: Upload code (check)
+        uses: google-github-actions/upload-cloud-storage@v1
+        with:
+          path: cloud/functions/check/check_task.zip
+          destination: ${{ env.GS_CLOUD_FUNCTIONS_CODE_BUCKET }}
+          parent: false
+          predefinedAcl: publicRead
+
+      - name: Clean up (check)
+        working-directory: cloud/functions/check
+        run: rm -rf check_task.zip

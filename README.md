@@ -42,6 +42,10 @@ To view the app, open the URL in your browser.
 Navigate to [BigQuery](https://console.cloud.google.com/bigquery) and make sure that `synthesize` and `check_synthesized` 
 routines exist under the specified dataset.
 
+The created functions look like this:
+
+![bigquery_functions.png](docs%2Fimages%2Fbigquery_functions.png)
+
 Change the dataset, table names and [config](https://docs.synthesized.io/sdk/latest/getting_started/yaml) and run the following SQL script:
 ```sql
 SELECT dataset.synthesize('input_table', 'output_table', '{"synthesize": {"num_rows": 1000, "produce_nans": true}}');

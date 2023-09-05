@@ -7,11 +7,14 @@ import os
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
 base_url = os.environ.get('FLOWER_API_URL')
+if base_url is None:
+    raise ValueError("FLOWER_API_URL environment variable is not defined.")
+run_task_url = f"{base_url}/api/task/send-task/worker.main.synthesize_run"
 
 
 @functions_framework.http
 def synthesize(request):
-    request_json = request.get_json(silent=True)
+    request_json = request.get_json()
     logging.debug(f"Request: {request_json}")
     params = request_json['calls'][0]
 
@@ -23,7 +26,6 @@ def synthesize(request):
         ]
     }
 
-    run_task_url = f"{base_url}/api/task/send-task/worker.main.synthesize_run"
     try:
         response = requests.post(run_task_url, json=sdk_request)
 
