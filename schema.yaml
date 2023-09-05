@@ -82,18 +82,13 @@ properties:
     pattern: '^[1-9][0-9]*(\.[0-9]+)?[TGM]i?$'
   redis.persistence.storageClass:
     type: string
-    title: StorageClass
+    title: Storage Class
     description: You can choose an existing StorageClass or create a new one. The newly created StorageClass provisioner will be "pd-ssd".
     default: "standard"
     x-google-marketplace:
       type: STORAGE_CLASS
       storageClass:
         type: SSD
-  worker.envRenderSecret.SYNTHESIZED_KEY:
-    title: Synthesized Licence Key
-    type: string
-    x-google-marketplace:
-      type: MASKED_FIELD
 
   # Generated values
   serviceAccount:
@@ -124,6 +119,10 @@ properties:
         generatedProperties:
           base64EncodedPrivateKey: tls.base64EncodedPrivateKey
           base64EncodedCertificate: tls.base64EncodedCertificate
+  reportingSecret:
+    type: string
+    x-google-marketplace:
+      type: REPORTING_SECRET
 
 required:
   - name
