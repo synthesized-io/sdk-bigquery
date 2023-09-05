@@ -11,7 +11,7 @@ metadata:
 spec:
   descriptor:
     type: SDK
-    version: "{{ .Values.image.tag }}"
+    version: "{{ .Values.worker.image.tag }}"
     description: |-
       Synthesized Scientific Data Kit (SDK) is a comprehensive framework for generative modelling for structured data (tabular, time-series and event-based data). The SDK helps you create compliant statistical-preserving data snapshots for BI/Analytics and ML/AI applications. Right-size your data with AI-supported data transformations.
       This delivery contains the SDK bundled up with Flower, Redis and SDK Celery worker nodes.
