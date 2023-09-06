@@ -1,0 +1,222 @@
+name: Build and push images
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  SDK_SERVICE_TAG: 1.0-sdk2.7
+  REDIS_IMAGE: redis:7.2.0-alpine
+  FLOWER_IMAGE: mher/flower:2.0
+
+  REGISTRY: gcr.io/synthesized-marketplace-public
+  APP_NAME: sdk-service
+  MARKETPLACE_TOOLS_TAG: 0.11.8
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  push-sdk-worker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+ 
+      - name: Authenticate GCloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_KEY }}
+ 
+      - name: Setup GCloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+ 
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+ 
+      - name: Extract metadata
+        id: gcr-meta
+        uses: docker/metadata-action@ef25336f420be2d1a49205baf41a9b88712a65a1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.APP_NAME }}/worker
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Push image from Docker Hub to GCR
+        working-directory: .github/scripts
+        run: |
+          DOCKER_IMAGE_NAME="${{ secrets.SDK_SERVICE_IMAGE }}:${{ env.SDK_SERVICE_TAG }}"
+          DOCKER_METADATA_JSON="$DOCKER_METADATA_OUTPUT_JSON"
+
+          ./tag_and_push_image.sh "$DOCKER_IMAGE_NAME" "$DOCKER_METADATA_JSON"
+
+  push-flower:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Authenticate GCloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_KEY }}
+
+      - name: Setup GCloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Extract metadata
+        id: gcr-meta
+        uses: docker/metadata-action@ef25336f420be2d1a49205baf41a9b88712a65a1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.APP_NAME }}/flower
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Push image from Docker Hub to GCR
+        working-directory: .github/scripts
+        run: |
+          DOCKER_IMAGE_NAME="${{ env.FLOWER_IMAGE }}"
+          DOCKER_METADATA_JSON="$DOCKER_METADATA_OUTPUT_JSON"
+
+          ./tag_and_push_image.sh "$DOCKER_IMAGE_NAME" "$DOCKER_METADATA_JSON"
+
+  push-redis:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Authenticate GCloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_KEY }}
+
+      - name: Setup GCloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Extract metadata
+        id: gcr-meta
+        uses: docker/metadata-action@ef25336f420be2d1a49205baf41a9b88712a65a1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.APP_NAME }}/redis
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Push image from Docker Hub to GCR
+        working-directory: .github/scripts
+        run: |
+          DOCKER_IMAGE_NAME="${{ env.REDIS_IMAGE }}"
+          DOCKER_METADATA_JSON="$DOCKER_METADATA_OUTPUT_JSON"
+          
+          ./tag_and_push_image.sh "$DOCKER_IMAGE_NAME" "$DOCKER_METADATA_JSON"
+
+  build-and-push-deployer:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Authenticate GCloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_KEY }}
+
+      - name: Setup GCloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Extract metadata
+        id: gcr-meta
+        uses: docker/metadata-action@ef25336f420be2d1a49205baf41a9b88712a65a1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.APP_NAME }}/deployer
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push
+        uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825
+        with:
+          context: .
+          build-args: |
+            REGISTRY=${{ env.REGISTRY }}
+            APP_INSTANCE_NAME=${{ env.APP_NAME }}
+            MARKETPLACE_TOOLS_TAG=${{ env.MARKETPLACE_TOOLS_TAG }}
+            CHART_NAME=${{ env.APP_NAME }}
+            TAG=${{ github.ref_name }}
+          push: true
+          tags: |
+            ${{ steps.gcr-meta.outputs.tags }}
+
+
+  build-and-push-tester:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Authenticate GCloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_KEY }}
+
+      - name: Setup GCloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Extract metadata
+        id: gcr-meta
+        uses: docker/metadata-action@ef25336f420be2d1a49205baf41a9b88712a65a1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.APP_NAME }}/tester
+          flavor: |
+            latest=false
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push
+        uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825
+        with:
+          context: apptest/tester
+          push: true
+          tags: |
+            ${{ steps.gcr-meta.outputs.tags }}

@@ -1,0 +1,33 @@
+resources:
+- type: gcp-types/cloudfunctions-v2beta:projects.locations.functions
+  name: {{ env.deployment }}-synthesize-run
+  properties:
+    parent: projects/{{ env.project }}/locations/{{ properties.region }}
+    function: synthesize-run
+    buildConfig:
+      source:
+        storageSource:
+          bucket: synthesized_marketplace_cloud_functions
+          object: run_task.zip
+      entryPoint: synthesize
+      runtime: python311
+    serviceConfig:
+      vpcConnector: projects/{{ env.project }}/locations/{{ properties.region }}/connectors/{{ properties.vpcConnector }}
+      environmentVariables:
+        FLOWER_API_URL: http://{{ properties.clusterIP }}:5555
+- type: gcp-types/cloudfunctions-v2beta:projects.locations.functions
+  name: {{ env.deployment }}-synthesize-check
+  properties:
+    parent: projects/{{ env.project }}/locations/{{ properties.region }}
+    function: synthesize-check
+    buildConfig:
+      source:
+        storageSource:
+          bucket: synthesize_marketplace_cloud_functions
+          object: check_task.zip
+      entryPoint: get_task_status
+      runtime: python311
+    serviceConfig:
+      vpcConnector: projects/{{ env.project }}/locations/{{ properties.region }}/connectors/{{ properties.vpcConnector }}
+      environmentVariables:
+        FLOWER_API_URL: http://{{ properties.clusterIP }}:5555
