@@ -52,19 +52,12 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Push image from Docker Hub to GHCR
+        working-directory: .github/scripts
         run: |
-          tags=$(echo "$DOCKER_METADATA_OUTPUT_JSON" | jq -r '.tags | join(" ")')
-          IFS=' ' read -ra tags_array <<< "$tags"
-          
-          docker_cmd="docker buildx imagetools create"
-          for tag in "${tags_array[@]}"; do
-            docker_cmd+=" --tag $tag"
-          done
-          
-          docker_cmd+=" ${{ secrets.SDK_SERVICE }}:${{ env.SDK_SERVICE_TAG }}"
-          
-          echo "$docker_cmd"
-          eval "$docker_cmd"
+          DOCKER_IMAGE_NAME="${{ secrets.SDK_SERVICE }}:${{ env.SDK_SERVICE_TAG }}"
+          DOCKER_METADATA_JSON="$DOCKER_METADATA_OUTPUT_JSON"
+
+          ./tag_and_push_image.sh "$DOCKER_IMAGE_NAME" "$DOCKER_METADATA_JSON"
 
   push-flower:
     runs-on: ubuntu-latest
@@ -98,19 +91,12 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Push image from Docker Hub to GHCR
+        working-directory: .github/scripts
         run: |
-          tags=$(echo "$DOCKER_METADATA_OUTPUT_JSON" | jq -r '.tags | join(" ")')
-          IFS=' ' read -ra tags_array <<< "$tags"
-          
-          docker_cmd="docker buildx imagetools create"
-          for tag in "${tags_array[@]}"; do
-            docker_cmd+=" --tag $tag"
-          done
-          
-          docker_cmd+=" ${{ env.FLOWER_IMAGE }}"
-          
-          echo "$docker_cmd"
-          eval "$docker_cmd"
+          DOCKER_IMAGE_NAME="${{ env.FLOWER_IMAGE }}"
+          DOCKER_METADATA_JSON="$DOCKER_METADATA_OUTPUT_JSON"
+
+          ./tag_and_push_image.sh "$DOCKER_IMAGE_NAME" "$DOCKER_METADATA_JSON"
 
   push-redis:
     runs-on: ubuntu-latest
@@ -144,19 +130,10 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Push image from Docker Hub to GHCR
+        working-directory: .github/scripts
         run: |
-          tags=$(echo "$DOCKER_METADATA_OUTPUT_JSON" | jq -r '.tags | join(" ")')
-          IFS=' ' read -ra tags_array <<< "$tags"
-          
-          docker_cmd="docker buildx imagetools create"
-          for tag in "${tags_array[@]}"; do
-            docker_cmd+=" --tag $tag"
-          done
-          
-          docker_cmd+=" ${{ env.REDIS_IMAGE }}"
-          
-          echo "$docker_cmd"
-          eval "$docker_cmd"
+          DOCKER_IMAGE_NAME="${{ env.REDIS_IMAGE }}"
+          DOCKER_METADATA_JSON="$DOCKER_METADATA_OUTPUT_JSON"
 
   build-and-push-deployer:
     runs-on: ubuntu-latest
