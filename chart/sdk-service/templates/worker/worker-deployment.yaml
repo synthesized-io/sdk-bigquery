@@ -48,6 +48,10 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.reportingSecret }}
                   key: entitlement-id
+            - name: SDK_GCP_ENABLED
+              value: "true"
+            - name: SDK_GCP_METRIC_ID
+              value: "time"
           {{- range $key, $val := .Values.worker.env }}
             - name: {{ $key }}
               value: {{ $val | quote }}
