@@ -6,9 +6,11 @@ Available on the GCP Cloud Marketplace: https://console.cloud.google.com/marketp
 
 # Architecture
 
-//TODO
+![architecture.png](docs%2Fimages%2Farchitecture.png)
 
 # Installation
+
+![deployment.png](docs%2Fimages%2Fdeployment.png)
 
 ## Deploy Kubernetes resources
 
