@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PLATFORM="linux/amd64"
+
 # Define the Docker image name (passed as the first argument)
 DOCKER_IMAGE_NAME="$1"
 
@@ -10,17 +12,14 @@ DOCKER_METADATA_JSON="$2"
 tags=$(echo "$DOCKER_METADATA_JSON" | jq -r '.tags | join(" ")')
 IFS=' ' read -ra tags_array <<< "$tags"
 
-# Build the docker command
-docker_cmd="docker buildx imagetools create"
+docker pull "$DOCKER_IMAGE_NAME" --platform $PLATFORM
+
 for tag in "${tags_array[@]}"; do
-  docker_cmd+=" --tag $tag"
+  export docker_tag_cmd="docker tag $DOCKER_IMAGE_NAME $tag"
+  echo "$docker_tag_cmd"
+  eval "$docker_tag_cmd"
+
+  export docker_push_cmd="docker push $tag"
+  echo "$docker_push_cmd"
+  eval "$docker_push_cmd"
 done
-
-# Append the image name
-docker_cmd+=" $DOCKER_IMAGE_NAME"
-
-# Print the command for debugging purposes
-echo "$docker_cmd"
-
-# Execute the docker command
-eval "$docker_cmd"
