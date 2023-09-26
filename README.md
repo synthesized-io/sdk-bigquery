@@ -50,7 +50,7 @@ The created functions look like this:
 
 Change the dataset, table names and [config](https://docs.synthesized.io/sdk/latest/getting_started/yaml) and run the following SQL script:
 ```sql
-SELECT dataset.synthesize('input_table', 'output_table', '{"synthesize": {"num_rows": 1000, "produce_nans": true}}');
+SELECT dataset.synthesize('project.dataset.input_table', 'project.dataset.output_table', '{"synthesize": {"num_rows": 1000, "produce_nans": true}}');
 ```
 
 The output should be similar to
@@ -91,8 +91,8 @@ At the moment, the application does not support exporting Prometheus metrics and
 Set your installation name and Kubernetes namespace:
 
 ```shell
-export APP_INSTANCE_NAME=sdk-service
-export NAMESPACE=default
+export APP_INSTANCE_NAME=synthesized-sdk
+export NAMESPACE=synthesized-sdk
 ```
 
 #### Deleting your resources

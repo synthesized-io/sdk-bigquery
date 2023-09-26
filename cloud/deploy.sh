@@ -6,6 +6,10 @@ set -u
 export VPC_CONNECTOR=synthesized-connector
 export BQ_CONNECTION_NAME="ext-synthesized-connection"
 
+# Create VPC Connector
+gcloud compute networks vpc-access connectors create $VPC_CONNECTOR --region=$REGION --network=$NETWORK \
+  --range=$VPC_CONNECTOR_RANGE --machine-type=f1-micro --min-instances 2 --max-instances 3
+
 # Create GCP cloud functions:
 gcloud deployment-manager deployments create synthesized-deployment --template=cloud-functions.jinja \
   --properties region:$REGION,vpcConnector:$VPC_CONNECTOR,clusterIP:$CLUSTER_IP

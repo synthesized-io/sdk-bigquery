@@ -76,7 +76,7 @@ Choose an instance name and
 for the app.
 
 ```shell
-export APP_INSTANCE_NAME=sdk-service
+export APP_INSTANCE_NAME=synthesized-sdk
 export NAMESPACE=synthesized-sdk
 ```
 

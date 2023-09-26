@@ -26,7 +26,7 @@ gcloud services enable \
 > **_NOTE:_**  The values in the code blocks are just examples. Please change values if necessary here and below.
 
 ```shell
-export APP_INSTANCE_NAME=sdk-service
+export APP_INSTANCE_NAME=synthesized-sdk
 export NAMESPACE=synthesized-sdk
 ```
 
