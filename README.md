@@ -2,7 +2,7 @@
 
 Synthesized Scientific Data Kit (SDK) is a comprehensive framework for generative modelling for structured data (tabular, time-series and event-based data). The SDK helps you create compliant statistical-preserving data snapshots for BI/Analytics and ML/AI applications. Right-size your data with AI-supported data transformations.
 
-Available on the GCP Cloud Marketplace: https://console.cloud.google.com/marketplace/product/synthesized-marketplace-public/synthesized-sdk
+Available on the GCP Cloud Marketplace: https://console.cloud.google.com/marketplace/product/synthesized-marketplace-public/synthesized-sdk-service
 
 # Architecture
 
@@ -17,7 +17,7 @@ Available on the GCP Cloud Marketplace: https://console.cloud.google.com/marketp
 ### Quick install with Google Cloud Marketplace
 
 To install Synthesized SDK Service to a Google Kubernetes Engine cluster via Google Cloud Marketplace, follow the
-[on-screen instructions](https://console.cloud.google.com/marketplace/product/synthesized-marketplace-public/synthesized-sdk).
+[on-screen instructions](https://console.cloud.google.com/marketplace/product/synthesized-marketplace-public/synthesized-sdk-service).
 
 ### Command-line instructions
 

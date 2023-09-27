@@ -52,8 +52,6 @@ spec:
               value: "TRUE"
             - name: SDK_GCP_METRIC_ID
               value: "time"
-            - name: SERVICE_NAME
-              value: "synthesized-sdk.endpoints.synthesized-marketplace-public.cloud.goog"
           {{- range $key, $val := .Values.worker.env }}
             - name: {{ $key }}
               value: {{ $val | quote }}
