@@ -6,7 +6,7 @@ on:
       - '*'
 
 env:
-  SDK_SERVICE_TAG: 1.5-sdk2.9rc2
+  SDK_SERVICE_TAG: 1.8-sdk2.9-rc4
   REDIS_IMAGE: redis:7.2.0-alpine
   FLOWER_IMAGE: mher/flower:2.0
 
