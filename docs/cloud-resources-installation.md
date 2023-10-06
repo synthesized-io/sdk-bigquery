@@ -8,6 +8,7 @@ You need the following tools in your development environment:
 
 - [gcloud](https://cloud.google.com/sdk/gcloud/)
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [jq](https://jqlang.github.io/jq/)
 
 Enable APIs for GCP services:
 
@@ -20,6 +21,11 @@ gcloud services enable \
     bigqueryconnection.googleapis.com \
     vpcaccess.googleapis.com
 ```
+
+### Permissions
+
+You should have `Big Query Admin` role for successful run all process.
+
 
 ### Configure installation parameters
 
