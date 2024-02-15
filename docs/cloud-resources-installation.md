@@ -19,6 +19,7 @@ gcloud services enable \
     iam.googleapis.com \
     bigquery.googleapis.com \
     bigqueryconnection.googleapis.com \
+    cloudfunctions.googleapis.com \
     vpcaccess.googleapis.com
 ```
 
