@@ -20,6 +20,7 @@ gcloud services enable \
     bigquery.googleapis.com \
     bigqueryconnection.googleapis.com \
     cloudfunctions.googleapis.com \
+    run.googleapis.com
     vpcaccess.googleapis.com
 ```
 
