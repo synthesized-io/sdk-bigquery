@@ -85,29 +85,6 @@ properties:
         type: SSD
 
   # Generated values
-  serviceAccount:
-    type: string
-    title: Service account used by all instances
-    x-google-marketplace:
-      type: SERVICE_ACCOUNT
-      serviceAccount:
-        description: Service account used by Synthesized SDK deployment
-        roles:
-          - type: ClusterRole
-            rulesType: CUSTOM
-            rules:
-              - apiGroups: [ "" ]
-                resources: [ "pods", "serviceaccounts" ]
-                verbs: [ "get", "list" ]
-              - apiGroups: [ "extensions" ]
-                resources: [ "deployments" ]
-                verbs: [ "get", "list" ]
-              - apiGroups: [ "apps" ]
-                resources: [ "deployments" ]
-                verbs: [ "get", "list" ]
-              - apiGroups: [ "" ]
-                resources: [ "pods/exec" ]
-                verbs: [ "create", "get" ]
   redis.password:
     type: string
     x-google-marketplace:
