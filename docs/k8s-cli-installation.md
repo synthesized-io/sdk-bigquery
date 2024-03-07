@@ -119,15 +119,6 @@ kubectl create namespace "${NAMESPACE}"
 
 ### Creating the Service Account
 
-To create the Service Account and ClusterRoleBinding:
-
-```shell
-export SDK_SERVICE_ACCOUNT="${APP_INSTANCE_NAME}-serviceaccount"
-kubectl create serviceaccount "${SDK_SERVICE_ACCOUNT}" --namespace "${NAMESPACE}"
-kubectl create clusterrole "${SDK_SERVICE_ACCOUNT}-role" --verb=get,list,watch --resource=services,nodes,pods,namespaces
-kubectl create clusterrolebinding "${SDK_SERVICE_ACCOUNT}-rule" --clusterrole="${SDK_SERVICE_ACCOUNT}-role" --serviceaccount="${NAMESPACE}:${SDK_SERVICE_ACCOUNT}"
-```
-
 Set or generate the password for Redis:
 
 ```shell
@@ -160,7 +151,6 @@ expanded manifest file for future updates to your app.
 helm template chart/sdk-service \
   --name-template "${APP_INSTANCE_NAME}" \
   --namespace "${NAMESPACE}" \
-  --set serviceAccount="${SDK_SERVICE_ACCOUNT}" \
   --set flower.image.repository="${IMAGE_FLOWER}" \
   --set flower.image.tag="${TAG}" \
   --set redis.image.repository="${IMAGE_REDIS}" \

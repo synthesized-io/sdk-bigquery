@@ -73,9 +73,6 @@ worker:
   # If secretRef is used, the envRenderSecret parameter will be omitted (in case that it has content).
   secretRef:
 
-
-serviceAccount:
-
 securityContext: {}
   # capabilities:
   #   drop:
