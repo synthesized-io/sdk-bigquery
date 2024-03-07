@@ -117,8 +117,6 @@ running the following command:
 kubectl create namespace "${NAMESPACE}"
 ```
 
-### Creating the Service Account
-
 Set or generate the password for Redis:
 
 ```shell
